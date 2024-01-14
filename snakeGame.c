@@ -2,8 +2,8 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
-#define cols 10
-#define rows 10
+#define cols 20
+#define rows 20
 
 int gameOver = 0;
 
@@ -39,17 +39,35 @@ void print_matrix(){
         }
 }
 
+#define SNAKE_MAX_LEN 256
 
-int snakeX = 5;
-int snakeY = 5;
+struct snakePart{
+    int x;
+    int y;
+};
+
+struct Snake{
+    int length;
+    struct snakePart part[SNAKE_MAX_LEN];
+};
+
+struct Snake snake;
+
 void draw_snake(){
-    matrix[snakeY*cols + snakeX] = '@';
+    for(int i=snake.length-1; i>0; i--){
+        matrix[snake.part[i].y*cols + snake.part[i].x] = '*';
+    }
+    matrix[snake.part[0].y*cols + snake.part[0].x] = '@';
 }
 
 void move_snake(int x, int y){
-    clear();
-    snakeX += x;
-    snakeY += y;
+
+    for(int i=snake.length-1; i>0; i--){
+        clear();
+        snake.part[i] = snake.part[i-1];
+    }
+    snake.part[0].x += x;
+    snake.part[0].y += y;
 }
 
 void read_keyboard(){
@@ -66,8 +84,17 @@ int main(int argc, char ** argv){
 
     initscr();
     init_matrix();
+    snake.length = 4;
+    snake.part[0].x = 5;
+    snake.part[0].y = 5;
+    snake.part[1].x = 5;
+    snake.part[1].y = 6;
+    snake.part[2].x = 5;
+    snake.part[2].y = 7;
+    snake.part[3].x = 5;
+    snake.part[3].y = 8;
 
-    while(1){
+    while(!gameOver){
         fill_matrix();
         draw_snake();
         print_matrix();
