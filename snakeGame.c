@@ -104,13 +104,18 @@ void create_snake(){
 void print_matrix(){
     int x,y;
 
+    printw("Snake Game!\n");
     for(y=0; y<rows; y++){
         for(x=0; x < cols; x++){
             addch(matrix[y*cols + x]);
         }
         addch('\n');
         }
-    printw("Score: %d\n", snake.length*100);
+    if(!gameOver)
+       printw("Score: %d\n", snake.length*100);
+    else
+        printw("Game Over! Final score: %d\n", snake.length*100);
+
 }
 
 void game_logic(){
@@ -119,8 +124,12 @@ void game_logic(){
             if(foods[i].x == snake.part[0].x &&
                     foods[i].y == snake.part[0].y){
                         foods[i].consumed = 1;
+                        snake.length++;
             }
         }
+        if(snake.part[0].x == 0 || snake.part[0].x == cols-1||
+           snake.part[0].y == 0 || snake.part[0].y == rows-1)
+            gameOver = 1;
     }
 }
 
@@ -141,6 +150,10 @@ int main(int argc, char ** argv){
         refresh();
         read_keyboard();
     }
+
+    print_matrix();
+    while(1) getch();
+
     return 0;
 }
 
