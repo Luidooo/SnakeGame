@@ -75,7 +75,7 @@ void read_keyboard(){
         case 'w': move_snake(0,-1); break;
         case KEY_UP : move_snake(0,-1); break;
         case 's': move_snake(0,1); break;
-        case KEY_LEFT : move_snake(0,1); break;
+        case KEY_DOWN : move_snake(0,1); break;
         case 'a': move_snake(-1,0); break;
         case KEY_RIGHT: move_snake(-1,0); break;
         case 'd': move_snake(1,0); break;
