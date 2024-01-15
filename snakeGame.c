@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <ncurses.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define cols 20
 #define rows 20
+#define food_qtd 10
 
 int gameOver = 0;
 
@@ -28,17 +30,6 @@ void fill_matrix(){
     }
 }
 
-void print_matrix(){
-    int x,y;
-
-    for(y=0; y<rows; y++){
-        for(x=0; x < cols; x++){
-            addch(matrix[y*cols + x]);
-        }
-        addch('\n');
-        }
-}
-
 #define SNAKE_MAX_LEN 256
 
 struct snakePart{
@@ -53,17 +44,25 @@ struct Snake{
 
 struct Snake snake;
 
+struct Food{
+    int x,y;
+    int consumed;
+};
+
+struct Food foods[food_qtd];
+
 void draw_snake(){
-    for(int i=snake.length-1; i>0; i--){
-        matrix[snake.part[i].y*cols + snake.part[i].x] = '*';
+
+    for(int i=snake.length-1; i>=0; i--){
+         matrix[snake.part[i].y*cols + snake.part[i].x] = '*';
     }
     matrix[snake.part[0].y*cols + snake.part[0].x] = '@';
 }
 
 void move_snake(int x, int y){
 
+    clear();
     for(int i=snake.length-1; i>0; i--){
-        clear();
         snake.part[i] = snake.part[i-1];
     }
     snake.part[0].x += x;
@@ -80,23 +79,64 @@ void read_keyboard(){
     }
 }
 
+void draw_food(){
+    for(int i=0; i < food_qtd;i++){
+        if(!foods[i].consumed){
+            matrix[foods[i].y*cols + foods[i].x] = '+';
+        }
+    }
+}
+
+void create_food(){
+ for(int i=0; i < food_qtd;i++){
+    foods[i].x = 1+rand() %(cols-2);
+    foods[i].y = 1+rand() %(rows-2);
+    foods[i].consumed = 0;
+ }
+}
+
+void create_snake(){
+    snake.length = 1;
+    snake.part[0].x = 1+rand() %(cols-2);
+    snake.part[0].y = 1+rand() %(rows-2);
+}
+
+void print_matrix(){
+    int x,y;
+
+    for(y=0; y<rows; y++){
+        for(x=0; x < cols; x++){
+            addch(matrix[y*cols + x]);
+        }
+        addch('\n');
+        }
+    printw("Score: %d\n", snake.length*100);
+}
+
+void game_logic(){
+    for(int i=0; i<food_qtd; i++){
+        if(!foods[i].consumed){
+            if(foods[i].x == snake.part[0].x &&
+                    foods[i].y == snake.part[0].y){
+                        foods[i].consumed = 1;
+            }
+        }
+    }
+}
+
 int main(int argc, char ** argv){
 
+    srand(time(0));
     initscr();
     init_matrix();
-    snake.length = 4;
-    snake.part[0].x = 5;
-    snake.part[0].y = 5;
-    snake.part[1].x = 5;
-    snake.part[1].y = 6;
-    snake.part[2].x = 5;
-    snake.part[2].y = 7;
-    snake.part[3].x = 5;
-    snake.part[3].y = 8;
+    create_food();
+    create_snake();
 
-    while(!gameOver){
+        while(!gameOver){
         fill_matrix();
+        draw_food();
         draw_snake();
+        game_logic();
         print_matrix();
         refresh();
         read_keyboard();
