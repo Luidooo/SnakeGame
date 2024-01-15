@@ -5,7 +5,7 @@
 
 #define cols 20
 #define rows 20
-#define food_qtd 10
+#define food_qtd 5
 
 int gameOver = 0;
 
@@ -73,9 +73,14 @@ void read_keyboard(){
     int ch = getch();
     switch(ch){
         case 'w': move_snake(0,-1); break;
+        case KEY_UP : move_snake(0,-1); break;
         case 's': move_snake(0,1); break;
+        case KEY_LEFT : move_snake(0,1); break;
         case 'a': move_snake(-1,0); break;
+        case KEY_RIGHT: move_snake(-1,0); break;
         case 'd': move_snake(1,0); break;
+        case KEY_LEFT: move_snake(1,0); break;
+
     }
 }
 
@@ -130,6 +135,17 @@ void game_logic(){
         if(snake.part[0].x == 0 || snake.part[0].x == cols-1||
            snake.part[0].y == 0 || snake.part[0].y == rows-1)
             gameOver = 1;
+        for(int i=1;i<snake.length-1;i++){
+            if(snake.part[0].x == snake.part[i].x &&
+                snake.part[0].y == snake.part[i].y )
+                    gameOver = 1;
+        }
+    int food_sum = 0;
+    for(int i=0; i<food_qtd;i++)
+        food_sum += foods[i].consumed;
+    if(food_sum==food_qtd)
+        create_food();
+
     }
 }
 
